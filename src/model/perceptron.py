@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
 import sys
 import logging
 
@@ -55,10 +56,53 @@ class Perceptron(Classifier):
         verbose : boolean
             Print logging messages with validation accuracy if verbose is True.
         """
+        bestClassificationResult = len(self.validationSet.input)
+        stagnation = 0
 
-        # Here you have to implement the Perceptron Learning Algorithm
-        # to change the weights of the Perceptron
-        pass
+        for i in range(1, self.epochs):
+            classifications = self.evaluate(self.trainingSet.input)
+            errors = []
+
+            for j in range(0, len(classifications)):
+                if classifications[j] != (self.trainingSet.label[j] != 0):
+                    #print("{0}: classifictation: {1}; label: {2}".format(j, classifications[j], self.trainingSet.label[j]))
+                    errors.append(j)
+
+            if verbose:
+                print("Found {0}/{1} errorneous classifications".format(len(errors), len(self.trainingSet.input)))
+
+            weightcopy = []
+            for j in self.weight:
+                weightcopy.append(j)
+
+            for j in errors:
+                for k in range(0, len(self.weight)):
+                    self.weight[k] -= self.trainingSet.input[j][k] * self.learningRate
+
+            print("Sum of abs weights: {0}".format(sum(map(abs, self.weight))))
+
+            if (self.weight == weightcopy).all():
+                print("Nothing changed!")
+            else:
+                print("Difference: {0}".format(sum(map(lambda x, y: abs(x - y), self.weight, weightcopy))))
+
+            validationClasses = self.evaluate(self.validationSet.input)
+            error = 0
+
+            for j in range(0, len(validationClasses)):
+                if validationClasses[j] != (self.validationSet.label[j] != 0):
+                    error += 1
+
+            print("Validation error: {0}".format(error))
+
+            if error >= bestClassificationResult:
+                stagnation += 1
+
+                if stagnation >= 5:
+                    break
+            else:
+                bestClassificationResult = error
+                stagnation = 0
 
     def classify(self, testInstance):
         """Classify a single instance.
@@ -72,10 +116,7 @@ class Perceptron(Classifier):
         bool :
             True if the testInstance is recognized as a 7, False otherwise.
         """
-        # Here you have to implement the classification for one instance,
-        # i.e., return True if the testInstance is recognized as a 7,
-        # False otherwise
-        pass
+        return self.fire(testInstance) > 0
 
     def evaluate(self, test=None):
         """Evaluate a whole dataset.
