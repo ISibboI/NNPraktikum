@@ -3,6 +3,7 @@
 from __future__ import print_function
 import sys
 import logging
+import random
 
 import numpy as np
 
@@ -59,35 +60,25 @@ class Perceptron(Classifier):
         bestClassificationResult = len(self.validationSet.input)
         stagnation = 0
 
-        for i in range(1, self.epochs):
-            classifications = self.evaluate(self.trainingSet.input)
-            errors = []
+        for i in range(0, self.epochs):
+            # Minibatch update
+            # Doesn't help in this case, since the classifier is linear, but I implemented it anyways
+            shuffledIndexes = range(0, len(self.trainingSet.input))
+            random.shuffle(shuffledIndexes)
+            batchSize = 64
+            
+            for offset in range(0, len(self.trainingSet.input), batchSize):
+                batchData = []
+                batchLabels = []
+            
+                for index in range(offset, min(offset + batchSize, len(shuffledIndexes))):
+                    index = shuffledIndexes[index]
+                    batchData.append(self.trainingSet.input[index])
+                    batchLabels.append(self.trainingSet.label[index])
+                
+                self.batchUpdate(batchData, batchLabels, float(batchSize) / len(self.trainingSet.input))
 
-            for j in range(0, len(classifications)):
-                if classifications[j] != (self.trainingSet.label[j] != 0):
-                    #print("{0}: classifictation: {1}; label: {2}".format(j, classifications[j], self.trainingSet.label[j]))
-                    errors.append(j)
-
-            if debug:
-                print("Found {0}/{1} errorneous classifications".format(len(errors), len(self.trainingSet.input)))
-
-            weightcopy = []
-            for j in self.weight:
-                weightcopy.append(j)
-
-            for j in errors:
-                for k in range(0, len(self.weight)):
-                    self.weight[k] -= self.trainingSet.input[j][k] * self.learningRate
-
-            if debug:
-                print("Sum of abs weights: {0}".format(sum(map(abs, self.weight))))
-
-            if debug:
-                if (self.weight == weightcopy).all():
-                    print("Nothing changed!")
-                else:
-                    print("Difference: {0}".format(sum(map(lambda x, y: abs(x - y), self.weight, weightcopy))))
-
+            # Validation
             validationClasses = self.evaluate(self.validationSet.input)
             error = 0
 
@@ -98,6 +89,7 @@ class Perceptron(Classifier):
             if verbose:
                 print("Validation accuracy: {0}%".format(100 - error / float(len(validationClasses)) * 100))
 
+            # Abort early if classification results stop getting better to prevent overfitting
             if error >= bestClassificationResult:
                 stagnation += 1
 
@@ -106,6 +98,26 @@ class Perceptron(Classifier):
             else:
                 bestClassificationResult = error
                 stagnation = 0
+                
+    def batchUpdate(self, trainingData, trainingLabels, learningRateModifier=1.0, debug=False):
+        classifications = self.evaluate(trainingData)
+        errors = []
+        
+        # Find wrong classifications
+        for j in range(0, len(classifications)):
+            if classifications[j] != (trainingLabels[j] != 0):
+                errors.append(j)
+
+        if debug:
+            print("Found {0}/{1} errorneous classifications".format(len(errors), len(trainingData)))
+
+        # Update weights
+        for j in errors:
+            for k in range(0, len(self.weight)):
+                self.weight[k] -= float(trainingData[j][k]) * self.learningRate * learningRateModifier / len(trainingData)
+
+        if debug:
+            print("Sum of abs weights: {0}".format(sum(map(abs, self.weight))))
 
     def classify(self, testInstance):
         """Classify a single instance.
