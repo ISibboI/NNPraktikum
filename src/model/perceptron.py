@@ -48,7 +48,7 @@ class Perceptron(Classifier):
         # around 0 and 0.1
         self.weight = np.random.rand(self.trainingSet.input.shape[1])/10
 
-    def train(self, verbose=True):
+    def train(self, verbose=True, debug=False):
         """Train the perceptron with the perceptron learning algorithm.
 
         Parameters
@@ -68,7 +68,7 @@ class Perceptron(Classifier):
                     #print("{0}: classifictation: {1}; label: {2}".format(j, classifications[j], self.trainingSet.label[j]))
                     errors.append(j)
 
-            if verbose:
+            if debug:
                 print("Found {0}/{1} errorneous classifications".format(len(errors), len(self.trainingSet.input)))
 
             weightcopy = []
@@ -79,12 +79,14 @@ class Perceptron(Classifier):
                 for k in range(0, len(self.weight)):
                     self.weight[k] -= self.trainingSet.input[j][k] * self.learningRate
 
-            print("Sum of abs weights: {0}".format(sum(map(abs, self.weight))))
+            if debug:
+                print("Sum of abs weights: {0}".format(sum(map(abs, self.weight))))
 
-            if (self.weight == weightcopy).all():
-                print("Nothing changed!")
-            else:
-                print("Difference: {0}".format(sum(map(lambda x, y: abs(x - y), self.weight, weightcopy))))
+            if debug:
+                if (self.weight == weightcopy).all():
+                    print("Nothing changed!")
+                else:
+                    print("Difference: {0}".format(sum(map(lambda x, y: abs(x - y), self.weight, weightcopy))))
 
             validationClasses = self.evaluate(self.validationSet.input)
             error = 0
@@ -93,7 +95,8 @@ class Perceptron(Classifier):
                 if validationClasses[j] != (self.validationSet.label[j] != 0):
                     error += 1
 
-            print("Validation error: {0}".format(error))
+            if verbose:
+                print("Validation accuracy: {0}%".format(100 - error / float(len(validationClasses)) * 100))
 
             if error >= bestClassificationResult:
                 stagnation += 1
