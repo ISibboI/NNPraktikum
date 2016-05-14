@@ -6,9 +6,11 @@ import logging
 import random
 
 import numpy as np
+from sklearn.metrics import accuracy_score
 
 from util.activation_functions import Activation
 from model.classifier import Classifier
+
 
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     level=logging.DEBUG,
@@ -34,7 +36,7 @@ class Perceptron(Classifier):
     trainingSet : list
     validationSet : list
     testSet : list
-    weight : list
+    weight : ndarray
     """
     def __init__(self, train, valid, test, learningRate=0.01, epochs=50):
 
@@ -49,75 +51,52 @@ class Perceptron(Classifier):
         # around 0 and 0.1
         self.weight = np.random.rand(self.trainingSet.input.shape[1])/10
 
-    def train(self, verbose=True, debug=False):
-        """Train the perceptron with the perceptron learning algorithm.
+        # add bias weights at the beginning with the same random initialize
+        np.insert(self.weight, 0, np.random.rand()/10)
+
+        # add bias values ("1"s) at the beginning of all data sets
+        np.insert(self.trainingSet.input, 0, 1, axis=1)
+        np.insert(self.validationSet.input, 0, 1, axis=1)
+        np.insert(self.testSet.input, 0, 1, axis=1)
+
+    def train(self, verbose=True):
+        """
+        Train the perceptron with the perceptron learning algorithm.
 
         Parameters
         ----------
         verbose : boolean
             Print logging messages with validation accuracy if verbose is True.
         """
-        bestClassificationResult = len(self.validationSet.input)
-        stagnation = 0
 
-        for i in range(0, self.epochs):
-            # Minibatch update
-            # Doesn't help in this case, since the classifier is linear, but I implemented it anyways
-            shuffledIndexes = range(0, len(self.trainingSet.input))
-            random.shuffle(shuffledIndexes)
-            batchSize = 64
-            
-            for offset in range(0, len(self.trainingSet.input), batchSize):
-                batchData = []
-                batchLabels = []
-            
-                for index in range(offset, min(offset + batchSize, len(shuffledIndexes))):
-                    index = shuffledIndexes[index]
-                    batchData.append(self.trainingSet.input[index])
-                    batchLabels.append(self.trainingSet.label[index])
-                
-                self.batchUpdate(batchData, batchLabels, float(batchSize) / len(self.trainingSet.input))
+        for epoch in range(self.epochs):
+            if verbose:
+                print("Training epoch {0}/{1}.."
+                      .format(epoch + 1, self.epochs))
 
-            # Validation
-            validationClasses = self.evaluate(self.validationSet.input)
-            error = 0
-
-            for j in range(0, len(validationClasses)):
-                if validationClasses[j] != (self.validationSet.label[j] != 0):
-                    error += 1
+            self._train_one_epoch()
 
             if verbose:
-                print("Validation accuracy: {0}%".format(100 - error / float(len(validationClasses)) * 100))
+                accuracy = accuracy_score(self.validationSet.label,
+                                          self.evaluate(self.validationSet))
+                print("Accuracy on validation: {0:.2f}%"
+                      .format(accuracy*100))
+                print("-----------------------------")
 
-            # Abort early if classification results stop getting better to prevent overfitting
-            if error >= bestClassificationResult:
-                stagnation += 1
+    def _train_one_epoch(self):
+        """
+        Train one epoch, seeing all input instances
+        """
 
-                if stagnation >= 5:
-                    break
-            else:
-                bestClassificationResult = error
-                stagnation = 0
-                
-    def batchUpdate(self, trainingData, trainingLabels, learningRateModifier=1.0, debug=False):
-        classifications = self.evaluate(trainingData)
-        errors = []
-        
-        # Find wrong classifications
-        for j in range(0, len(classifications)):
-            if classifications[j] != (trainingLabels[j] != 0):
-                errors.append(j)
+        for img, label in zip(self.trainingSet.input, self.trainingSet.label):
+            output = self._fire(img)  # real output of the neuron
+            error = int(label) - int(output)
 
-        if debug:
-            print("Found {0}/{1} errorneous classifications".format(len(errors), len(trainingData)))
+            # online learning: updating weights after seeing 1 instance
+            self.weight += self.learningRate * error * img
 
-        # Update weights
-        for j in errors:
-            for k in range(0, len(self.weight)):
-                self.weight[k] -= float(trainingData[j][k]) * self.learningRate * learningRateModifier / len(trainingData)
-
-        if debug:
-            print("Sum of abs weights: {0}".format(sum(map(abs, self.weight))))
+        # if we want to do batch learning, accumulate the error
+        # and update the weight outside the loop
 
     def classify(self, testInstance):
         """Classify a single instance.
@@ -131,7 +110,10 @@ class Perceptron(Classifier):
         bool :
             True if the testInstance is recognized as a 7, False otherwise.
         """
-        return self.fire(testInstance) > 0
+        # Here you have to implement the classification for one instance,
+        # i.e., return True if the testInstance is recognized as a 7,
+        # False otherwise
+        return self._fire(testInstance)
 
     def evaluate(self, test=None):
         """Evaluate a whole dataset.
@@ -155,7 +137,7 @@ class Perceptron(Classifier):
         # set.
         return list(map(self.classify, test))
 
-    def fire(self, input):
+    def _fire(self, input):
         """Fire the output of the perceptron corresponding to the input """
         # I already implemented it for you to see how you can work with numpy
         return Activation.sign(np.dot(np.array(input), self.weight))
