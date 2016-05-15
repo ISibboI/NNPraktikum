@@ -46,14 +46,14 @@ class LogisticLayer():
         self.n_in = n_in
         self.n_out = n_out
 
-        self.inp = np.ndarray((n_in+1, 1))
+        self.inp = np.ndarray(n_in + 1)
         self.inp[0] = 1
-        self.outp = np.ndarray((n_out, 1))
-        self.deltas = np.zeros((n_out, 1))
+        self.outp = np.ndarray(n_out)
+        self.deltas = np.zeros(n_out)
 
         # You can have better initialization here
         if weights is None:
-            self.weight = np.random.rand(n_in, n_out)/10
+            self.weights = np.random.rand(n_in + 1, n_out)/10
         else:
             self.weights = weights
 
@@ -70,15 +70,19 @@ class LogisticLayer():
         Parameters
         ----------
         inp : ndarray
-            a numpy array (1,n_in + 1) containing the input of the layer
+            a numpy array (n_in, 1) containing the input of the layer
 
         Change outp
         -------
         outp: ndarray
-            a numpy array (1,n_out) containing the output of the layer
+            a numpy array (n_out, 1) containing the output of the layer
         """
 
-        # Here you have to implement the forward pass
+        self.inp[1:self.n_in + 1] = inp
+
+        for neuron in range(0, self.n_out):
+            self.outp[neuron] = self.activation(sum(self.inp * self.weights[:, neuron]))
+
         pass
 
     def computeDerivative(self, nextDerivatives, nextWeights):
@@ -99,15 +103,24 @@ class LogisticLayer():
         """
 
         # Here the implementation of partial derivative calculation
+        for i in range(0, len(self.deltas)):
+            self.deltas[i] = Activation.sigmoid_prime(self.outp[i]) * np.dot(nextDerivatives, nextWeights[i])
+
         pass
 
-    def updateWeights(self):
+    def computeOutputDerivative(self, targetOutputs):
+        self.deltas = (targetOutputs - self.outp) * self.outp * (1 - self.outp)
+
+    def updateWeights(self, learningRate):
         """
         Update the weights of the layer
         """
 
         # Here the implementation of weight updating mechanism
+        for neuron in range(0, self.n_out):
+            self.weights[:, neuron] += learningRate * self.deltas[neuron] * self.inp
+
         pass
 
     def _fire(self, inp):
-        return Activation.sigmoid(np.dot(np.array(inp), self.weight))
+        return Activation.sigmoid(np.dot(np.array(inp), self.weights))
