@@ -18,7 +18,6 @@ def main():
                                         data.testSet,
                                         learningRate=0.005,
                                         epochs=10)
-    # Uncomment this to run Logistic Neuron Layer
     myLRClassifier = LogisticRegression(data.trainingSet,
                                          data.validationSet,
                                          data.testSet,

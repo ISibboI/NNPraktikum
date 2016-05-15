@@ -94,8 +94,6 @@ class LogisticRegression(Classifier):
             # online learning: updating weights after seeing 1 instance
             self.layer.updateWeights(self.learningRate)
 
-        print("(#True, #False) = ({0}, {1})".format(nTrue, nFalse))
-
     def classify(self, testInstance):
         """Classify a single instance.
 
