@@ -26,38 +26,41 @@ class Perceptron(Classifier):
     train : list
     valid : list
     test : list
-    learningRate : float
+    learning_rate : float
     epochs : positive int
 
     Attributes
     ----------
-    learningRate : float
+    learning_rate : float
     epochs : int
-    trainingSet : list
-    validationSet : list
-    testSet : list
+    training_set : list
+    validation_set : list
+    test_set : list
     weight : ndarray
     """
-    def __init__(self, train, valid, test, learningRate=0.01, epochs=50):
+    def __init__(self, train, valid, test, learning_rate=0.01, epochs=50):
 
-        self.learningRate = learningRate
+        self.learning_rate = learning_rate
         self.epochs = epochs
 
-        self.trainingSet = train
-        self.validationSet = valid
-        self.testSet = test
+        self.training_set = train
+        self.validation_set = valid
+        self.test_set = test
 
         # Initialize the weight vector with small random values
         # around 0 and 0.1
-        self.weight = np.random.rand(self.trainingSet.input.shape[1])/10
+
+        self.weight = np.random.rand(self.training_set.input.shape[1])/10
 
         # add bias weights at the beginning with the same random initialize
-        np.insert(self.weight, 0, np.random.rand()/10)
+        self.weight = np.insert(self.weight, 0, np.random.rand()/10)
 
         # add bias values ("1"s) at the beginning of all data sets
-        np.insert(self.trainingSet.input, 0, 1, axis=1)
-        np.insert(self.validationSet.input, 0, 1, axis=1)
-        np.insert(self.testSet.input, 0, 1, axis=1)
+        self.training_set.input = np.insert(self.training_set.input, 0, 1,
+                                            axis=1)
+        self.validation_set.input = np.insert(self.validation_set.input, 0, 1,
+                                              axis=1)
+        self.test_set.input = np.insert(self.test_set.input, 0, 1, axis=1)
 
     def train(self, verbose=True):
         """
@@ -77,8 +80,8 @@ class Perceptron(Classifier):
             self._train_one_epoch()
 
             if verbose:
-                accuracy = accuracy_score(self.validationSet.label,
-                                          self.evaluate(self.validationSet))
+                accuracy = accuracy_score(self.validation_set.label,
+                                          self.evaluate(self.validation_set))
                 print("Accuracy on validation: {0:.2f}%"
                       .format(accuracy*100))
                 print("-----------------------------")
@@ -88,17 +91,17 @@ class Perceptron(Classifier):
         Train one epoch, seeing all input instances
         """
 
-        for img, label in zip(self.trainingSet.input, self.trainingSet.label):
+        for img, label in zip(self.training_set.input,
+                              self.training_set.label):
             output = self._fire(img)  # real output of the neuron
             error = int(label) - int(output)
-
             # online learning: updating weights after seeing 1 instance
-            self.weight += self.learningRate * error * img
+            self.weight += self.learning_rate * error * img
 
         # if we want to do batch learning, accumulate the error
         # and update the weight outside the loop
 
-    def classify(self, testInstance):
+    def classify(self, test_instance):
         """Classify a single instance.
 
         Parameters
@@ -113,7 +116,7 @@ class Perceptron(Classifier):
         # Here you have to implement the classification for one instance,
         # i.e., return True if the testInstance is recognized as a 7,
         # False otherwise
-        return self._fire(testInstance)
+        return self._fire(test_instance)
 
     def evaluate(self, test=None):
         """Evaluate a whole dataset.
@@ -129,7 +132,7 @@ class Perceptron(Classifier):
             List of classified decisions for the dataset's entries.
         """
         if test is None:
-            test = self.testSet.input
+            test = self.test_set.input
 
         # Here is the map function of python - a functional programming concept
         # It applies the "classify" method to every element of "test"
@@ -137,7 +140,14 @@ class Perceptron(Classifier):
         # set.
         return list(map(self.classify, test))
 
-    def _fire(self, input):
+    def _fire(self, inp):
         """Fire the output of the perceptron corresponding to the input """
         # I already implemented it for you to see how you can work with numpy
-        return Activation.sign(np.dot(np.array(input), self.weight))
+        return Activation.sign(np.dot(np.array(inp), self.weight))
+
+    def __del__(self):
+        # Remove the bias from input data
+        self.training_set.input = np.delete(self.training_set.input, 0, axis=1)
+        self.validation_set.input = np.delete(self.validation_set.input, 0,
+                                              axis=1)
+        self.test_set.input = np.delete(self.test_set.input, 0, axis=1)

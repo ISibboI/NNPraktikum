@@ -25,7 +25,8 @@ class Activation:
     @staticmethod
     def sigmoid_prime(outp):
         # Here you have to code the derivative of sigmoid function
-        return outp * (1 - outp)
+        # netOutput.*(1-netOutput)
+        return outp*(1.0-outp)
 
     @staticmethod
     def tanh(outp):
@@ -51,6 +52,11 @@ class Activation:
     @staticmethod
     def softmax(outp):
         # Here you have to code the softmax function
+        pass
+
+    @staticmethod
+    def softmax_prime(outp):
+        # Here you have to code the the derivative of softmax function
         pass
 
     @staticmethod
@@ -81,6 +87,8 @@ class Activation:
             return Activation.sigmoid_prime
         elif function_name == 'tanh':
             return Activation.tanh_prime
+        elif function_name == 'softmax':
+            return Activation.softmax_prime
         elif function_name == 'linear':
             return Activation.identity_prime
         else:
