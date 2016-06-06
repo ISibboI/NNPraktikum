@@ -85,8 +85,7 @@ class BinaryCrossEntropyError(Error):
         self.error_string = 'bce'
 
     def calculate_error(self, target, output):
-        # Here you have to implement the Binary Cross Entropy
-        pass
+        return - target * np.log(output) - (1 - target) * np.log(1 - output)
 
 
 class CrossEntropyError(Error):
@@ -98,5 +97,5 @@ class CrossEntropyError(Error):
         self.error_string = 'crossentropy'
 
     def calculate_error(self, target, output):
-        # Here you have to implement the Cross Entropy Error
-        pass
+        raise Exception("Not implemented. What is the difference to BinaryCrossEntropyError"
+                        "from the programmers point of view?")

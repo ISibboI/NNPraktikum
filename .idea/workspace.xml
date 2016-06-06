@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c81e8ee4-c764-4dd3-9c06-a93eca804c30" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Run.py" afterPath="$PROJECT_DIR$/src/Run.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/util/activation_functions.py" afterPath="$PROJECT_DIR$/src/util/activation_functions.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/util/loss_functions.py" afterPath="$PROJECT_DIR$/src/util/loss_functions.py" />
     </list>
     <ignored path="NNPraktikum.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -37,20 +35,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="mlp.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="mlp.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/model/mlp.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="-1821">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="loss_functions.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/util/loss_functions.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-966">
               <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
@@ -70,6 +58,7 @@
         <option value="$PROJECT_DIR$/src/model/logistic_regression.py" />
         <option value="$PROJECT_DIR$/src/Run.py" />
         <option value="$PROJECT_DIR$/src/util/activation_functions.py" />
+        <option value="$PROJECT_DIR$/src/util/loss_functions.py" />
       </list>
     </option>
   </component>
@@ -740,14 +729,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/model/mlp.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1821">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/util/activation_functions.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
@@ -760,7 +741,17 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/util/loss_functions.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-966">
+        <state relative-caret-position="534">
+          <caret line="100" column="25" selection-start-line="100" selection-start-column="25" selection-end-line="100" selection-end-column="25" />
+          <folding>
+            <element signature="e#51#69#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/model/mlp.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1821">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
