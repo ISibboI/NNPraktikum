@@ -1,5 +1,6 @@
 
 import numpy as np
+from sklearn.metrics import accuracy_score
 
 # from util.activation_functions import Activation
 from model.logistic_layer import LogisticLayer
@@ -64,7 +65,9 @@ class MultilayerPerceptron(Classifier):
         # Here is an example of a MLP acting like the Logistic Regression
         self.layers = []
         output_activation = "sigmoid"
-        self.layers.append(LogisticLayer(10, 1, None, output_activation, True))
+        input_size = len(self.training_set.input.shape[1])
+        self.layers.append(LogisticLayer(input_size, input_size, None, output_activation, False))
+        self.layers.append(LogisticLayer(input_size, 1, None, output_activation, True))
 
     def _get_layer(self, layer_index):
         return self.layers[layer_index]
@@ -116,7 +119,22 @@ class MultilayerPerceptron(Classifier):
             Print logging messages with validation accuracy if verbose is True.
         """
 
-        pass
+        for epoch in range(self.epochs):
+            if verbose:
+                print("Training epoch {0}/{1}.."
+                      .format(epoch + 1, self.epochs))
+
+            self._train_one_epoch()
+
+            if verbose:
+                accuracy = accuracy_score(self.validation_set.label,
+                                          self.evaluate(self.validation_set))
+                # Record the performance of each epoch for later usages
+                # e.g. plotting, reporting..
+                self.performances.append(accuracy)
+                print("Accuracy on validation: {0:.2f}%"
+                      .format(accuracy * 100))
+                print("-----------------------------")
 
     def _train_one_epoch(self):
         """
