@@ -46,18 +46,18 @@ class Activation:
 
     @staticmethod
     def identity_prime(outp):
-        # Here you have to code the derivative of identity function
-        pass
+        return 0.0
 
     @staticmethod
     def softmax(outp):
-        # Here you have to code the softmax function
-        pass
+        numerator = exp(outp)
+        denominator = sum(numerator)
+
+        return numerator / denominator
 
     @staticmethod
     def softmax_prime(outp):
-        # Here you have to code the the derivative of softmax function
-        pass
+        return Activation.softmax(outp) * (1 - Activation.softmax(outp))
 
     @staticmethod
     def get_activation(function_name):

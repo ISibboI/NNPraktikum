@@ -77,7 +77,7 @@ def main():
                                            learning_rate=0.005,
                                            epochs=30)
 
-    print("\nLogistic Regression has been training..")
+    print("\nMulti-layer Perceptron has been training..")
     myMLPClassifier.train()
     print("Done..")
     # Do the recognizer
