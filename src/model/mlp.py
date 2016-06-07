@@ -53,6 +53,7 @@ class MultilayerPerceptron(Classifier):
 
         self.layers = layers
         self.input_weights = input_weights
+        input_size = self.training_set.input.shape[1]
 
         # add bias values ("1"s) at the beginning of all data sets
         self.training_set.input = np.insert(self.training_set.input, 0, 1,
@@ -62,10 +63,8 @@ class MultilayerPerceptron(Classifier):
         self.test_set.input = np.insert(self.test_set.input, 0, 1, axis=1)
 
         # Build up the network from specific layers
-        # Here is an example of a MLP acting like the Logistic Regression
         self.layers = []
         output_activation = "sigmoid"
-        input_size = len(self.training_set.input.shape[1])
         self.layers.append(LogisticLayer(input_size, input_size, None, output_activation, False))
         self.layers.append(LogisticLayer(input_size, 1, None, output_activation, True))
 
@@ -91,7 +90,10 @@ class MultilayerPerceptron(Classifier):
         # And remember the activation values of each layer
         """
 
-        pass
+        self.layers[0].forward(inp)
+
+        for i in range(1, len(self.layers)):
+            self.layers[i].forward(np.insert(self.layers[i - 1].outp, 0, 1))
 
     def _compute_error(self, target):
         """
@@ -102,13 +104,19 @@ class MultilayerPerceptron(Classifier):
         ndarray :
             a numpy array (1,nOut) containing the output of the layer
         """
-        pass
+
+        self.layers[-1].computeDerivative(target, None)
+
+        for i in range(len(self.layers) - 2, 0, -1):
+            self.layers[i].computeDerivative(self.layers[i + 1].deltas, self.layers[i + 1].weights)
 
     def _update_weights(self):
         """
         Update the weights of the layers by propagating back the error
         """
-        pass
+
+        for i in range(len(self.layers)):
+            self.layers[i].updateWeights(self.learning_rate)
 
     def train(self, verbose=True):
         """Train the Multi-layer Perceptrons
@@ -141,12 +149,29 @@ class MultilayerPerceptron(Classifier):
         Train one epoch, seeing all input instances
         """
 
-        pass
+        for img, label in zip(self.training_set.input,
+                              self.training_set.label):
+
+            # Use LogisticLayer to do the job
+            # Feed it with inputs
+
+            # Do a forward pass to calculate the output and the error
+            self._feed_forward(img)
+
+            # Compute the derivatives w.r.t to the error
+            # Please note the treatment of nextDerivatives and nextWeights
+            # in case of an output layer
+            self._compute_error(np.array(label))
+
+            # Update weights in the online learning fashion
+            self._update_weights()
 
     def classify(self, test_instance):
         # Classify an instance given the model of the classifier
         # You need to implement something here
-        return True
+
+        self._feed_forward(test_instance)
+        return self.layers[-1].outp[0] > 0.5
 
     def evaluate(self, test=None):
         """Evaluate a whole dataset.
