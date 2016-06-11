@@ -1,4 +1,5 @@
 import numpy as np
+from numpy import sum
 
 from util.activation_functions import Activation
 
@@ -56,6 +57,10 @@ class LogisticLayer():
         # You can have better initialization here
         if weights is None:
             self.weights = np.random.rand(n_in + 1, n_out) / 10 - 0.05
+
+            # Adjust weights to zero mean
+            for i in range(n_out):
+                self.weights[:][i] -= (sum(self.weights[:][i]) / len(self.weights[:][i]))
         else:
             assert(weights.shape == (n_in + 1, n_out))
             self.weights = weights

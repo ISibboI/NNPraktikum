@@ -75,7 +75,7 @@ def main():
                                            data.validation_set,
                                            data.test_set,
                                            learning_rate=0.005,
-                                           epochs=30)
+                                           epochs=300)
 
     print("\nMulti-layer Perceptron has been training..")
     myMLPClassifier.train()

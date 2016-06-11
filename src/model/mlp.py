@@ -122,7 +122,7 @@ class MultilayerPerceptron(Classifier):
         """
 
         # Learning rate modification function
-        modifier = exp((1 - round_fraction) * 5)
+        modifier = (exp(1 - round_fraction) - 1) * 40 + 1
 
         for i in range(len(self.layers)):
             self.layers[i].updateWeights(self.learning_rate * modifier)
