@@ -1,5 +1,6 @@
 
 import numpy as np
+from numpy import exp
 from sklearn.metrics import accuracy_score
 
 # from util.activation_functions import Activation
@@ -56,11 +57,11 @@ class MultilayerPerceptron(Classifier):
         input_size = self.training_set.input.shape[1]
 
         # add bias values ("1"s) at the beginning of all data sets
-        self.training_set.input = np.insert(self.training_set.input, 0, 1,
-                                            axis=1)
-        self.validation_set.input = np.insert(self.validation_set.input, 0, 1,
-                                              axis=1)
-        self.test_set.input = np.insert(self.test_set.input, 0, 1, axis=1)
+        # self.training_set.input = np.insert(self.training_set.input, 0, 1,
+        #                                     axis=1)
+        # self.validation_set.input = np.insert(self.validation_set.input, 0, 1,
+        #                                       axis=1)
+        # self.test_set.input = np.insert(self.test_set.input, 0, 1, axis=1)
 
         # Build up the network from specific layers
         self.layers = []
@@ -93,7 +94,10 @@ class MultilayerPerceptron(Classifier):
         self.layers[0].forward(inp)
 
         for i in range(1, len(self.layers)):
-            self.layers[i].forward(np.insert(self.layers[i - 1].outp, 0, 1))
+            self.layers[i].forward(self.layers[i - 1].outp)
+
+        # if self.layers[-1].outp[0] != 1.0:
+        #     print(self.layers[-1].outp[0])
 
     def _compute_error(self, target):
         """
@@ -110,13 +114,16 @@ class MultilayerPerceptron(Classifier):
         for i in range(len(self.layers) - 2, 0, -1):
             self.layers[i].computeDerivative(self.layers[i + 1].deltas, self.layers[i + 1].weights)
 
-    def _update_weights(self):
+    def _update_weights(self, round_fraction):
         """
         Update the weights of the layers by propagating back the error
         """
 
+        # Learning rate modification function
+        modifier = exp((1 - round_fraction) * 2)
+
         for i in range(len(self.layers)):
-            self.layers[i].updateWeights(self.learning_rate)
+            self.layers[i].updateWeights(self.learning_rate * modifier)
 
     def train(self, verbose=True):
         """Train the Multi-layer Perceptrons
@@ -132,7 +139,7 @@ class MultilayerPerceptron(Classifier):
                 print("Training epoch {0}/{1}.."
                       .format(epoch + 1, self.epochs))
 
-            self._train_one_epoch()
+            self._train_one_epoch(epoch / (self.epochs - 1))
 
             if verbose:
                 accuracy = accuracy_score(self.validation_set.label,
@@ -144,7 +151,7 @@ class MultilayerPerceptron(Classifier):
                       .format(accuracy * 100))
                 print("-----------------------------")
 
-    def _train_one_epoch(self):
+    def _train_one_epoch(self, round_fraction):
         """
         Train one epoch, seeing all input instances
         """
@@ -164,7 +171,7 @@ class MultilayerPerceptron(Classifier):
             self._compute_error(np.array(label))
 
             # Update weights in the online learning fashion
-            self._update_weights()
+            self._update_weights(round_fraction)
 
     def classify(self, test_instance):
         # Classify an instance given the model of the classifier
@@ -186,6 +193,7 @@ class MultilayerPerceptron(Classifier):
         List:
             List of classified decisions for the dataset's entries.
         """
+
         if test is None:
             test = self.test_set.input
         # Once you can classify an instance, just use map for all of the test

@@ -108,6 +108,9 @@ def main():
     plot = PerformancePlot("Logistic Regression")
     plot.draw_performance_epoch(myLRClassifier.performances,
                                 myLRClassifier.epochs)
+    plot = PerformancePlot("Multi-layer Perceptron")
+    plot.draw_performance_epoch(myMLPClassifier.performances,
+                                myMLPClassifier.epochs)
 
 if __name__ == '__main__':
     main()

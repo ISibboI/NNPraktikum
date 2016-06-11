@@ -55,11 +55,11 @@ class LogisticRegression(Classifier):
                                    is_classifier_layer=True)
 
         # add bias values ("1"s) at the beginning of all data sets
-        self.training_set.input = np.insert(self.training_set.input, 0, 1,
-                                            axis=1)
-        self.validation_set.input = np.insert(self.validation_set.input, 0, 1,
-                                              axis=1)
-        self.test_set.input = np.insert(self.test_set.input, 0, 1, axis=1)
+        # self.training_set.input = np.insert(self.training_set.input, 0, 1,
+        #                                     axis=1)
+        # self.validation_set.input = np.insert(self.validation_set.input, 0, 1,
+        #                                       axis=1)
+        # self.test_set.input = np.insert(self.test_set.input, 0, 1, axis=1)
 
     def train(self, verbose=True):
         """Train the Logistic Regression.

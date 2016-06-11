@@ -48,14 +48,14 @@ class LogisticLayer():
         self.n_in = n_in
         self.n_out = n_out
 
-        self.inp = np.ndarray((n_in+1, 1))
+        self.inp = np.ndarray(n_in + 1)
         self.inp[0] = 1
-        self.outp = np.ndarray((n_out, 1))
-        self.deltas = np.zeros((n_out, 1))
+        self.outp = np.ndarray(n_out)
+        self.deltas = np.zeros(n_out)
 
         # You can have better initialization here
         if weights is None:
-            self.weights = np.random.rand(n_in+1, n_out)/10
+            self.weights = np.random.rand(n_in + 1, n_out) / 10 - 0.05
         else:
             assert(weights.shape == (n_in + 1, n_out))
             self.weights = weights
@@ -73,20 +73,22 @@ class LogisticLayer():
         Parameters
         ----------
         inp : ndarray
-            a numpy array (n_in + 1,1) containing the input of the layer
+            a numpy array (n_in + 1, 1) containing the input of the layer
 
         Change outp
         -------
         outp: ndarray
-            a numpy array (n_out,1) containing the output of the layer
+            a numpy array (n_out, 1) containing the output of the layer
         """
 
         # Here you have to implement the forward pass
-        self.inp = inp
-        outp = self._fire(inp)
-        self.outp = outp
+        self.inp[1:] = inp
+        self.outp = self._fire(self.inp)
 
-        return outp
+        # print(self.inp)
+        # print(self.outp)
+
+        return self.outp
 
     def computeDerivative(self, next_derivatives, next_weights):
         """
