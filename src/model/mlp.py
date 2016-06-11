@@ -67,6 +67,7 @@ class MultilayerPerceptron(Classifier):
         self.layers = []
         output_activation = "sigmoid"
         self.layers.append(LogisticLayer(input_size, input_size, None, output_activation, False))
+        self.layers.append(LogisticLayer(input_size, input_size, None, output_activation, False))
         self.layers.append(LogisticLayer(input_size, 1, None, output_activation, True))
 
     def _get_layer(self, layer_index):
@@ -120,7 +121,7 @@ class MultilayerPerceptron(Classifier):
         """
 
         # Learning rate modification function
-        modifier = exp((1 - round_fraction) * 2)
+        modifier = exp((1 - round_fraction) * 5)
 
         for i in range(len(self.layers)):
             self.layers[i].updateWeights(self.learning_rate * modifier)

@@ -131,8 +131,8 @@ class LogisticLayer():
             self.deltas = (next_derivatives - self.outp) * self.outp * \
                           (1 - self.outp)
         else:
-            self.deltas = self.outp * (1 - self.outp) * \
-                          np.dot(next_derivatives, next_weights)
+            for i in range(len(self.deltas)):
+                self.deltas[i] = self.outp[i] * (1 - self.outp[i]) * np.dot(next_derivatives, next_weights[i])
         # Or you can have two computeDerivative methods, feel free to call
         # the other is computeOutputLayerDerivative or such.
 
