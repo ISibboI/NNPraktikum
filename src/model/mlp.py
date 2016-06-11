@@ -68,6 +68,7 @@ class MultilayerPerceptron(Classifier):
         output_activation = "sigmoid"
         self.layers.append(LogisticLayer(input_size, input_size, None, output_activation, False))
         self.layers.append(LogisticLayer(input_size, input_size, None, output_activation, False))
+        self.layers.append(LogisticLayer(input_size, input_size, None, output_activation, False))
         self.layers.append(LogisticLayer(input_size, 1, None, output_activation, True))
 
     def _get_layer(self, layer_index):
