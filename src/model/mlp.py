@@ -66,10 +66,10 @@ class MultilayerPerceptron(Classifier):
         # Build up the network from specific layers
         self.layers = []
         output_activation = "sigmoid"
+        # self.layers.append(LogisticLayer(input_size, input_size, None, output_activation, False))
+        # self.layers.append(LogisticLayer(input_size, input_size, None, output_activation, False))
         self.layers.append(LogisticLayer(input_size, input_size, None, output_activation, False))
-        self.layers.append(LogisticLayer(input_size, input_size, None, output_activation, False))
-        self.layers.append(LogisticLayer(input_size, input_size, None, output_activation, False))
-        self.layers.append(LogisticLayer(input_size, 1, None, output_activation, True))
+        self.layers.append(LogisticLayer(input_size, 10, None, output_activation, True))
 
     def _get_layer(self, layer_index):
         return self.layers[layer_index]
@@ -111,24 +111,28 @@ class MultilayerPerceptron(Classifier):
             a numpy array (1,nOut) containing the output of the layer
         """
 
-        self.layers[-1].computeDerivative(target, None)
+        targetv = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        targetv[target] = 1
+
+        self.layers[-1].computeDerivative(targetv, None)
 
         for i in range(len(self.layers) - 2, 0, -1):
             self.layers[i].computeDerivative(self.layers[i + 1].deltas, self.layers[i + 1].weights)
 
-    def _update_weights(self, round_fraction):
+    def _update_weights(self, epoch_fraction):
         """
         Update the weights of the layers by propagating back the error
         """
 
         # Learning rate modification function
-        modifier = (exp(1 - round_fraction) - 1) * 40 + 1
+        modifier = (exp(1 - epoch_fraction) - 1) * 8 + 1
 
         for i in range(len(self.layers)):
             self.layers[i].updateWeights(self.learning_rate * modifier)
 
     def train(self, verbose=True):
-        """Train the Multi-layer Perceptrons
+        """
+        Train the Multi-layer Perceptrons
 
         Parameters
         ----------
@@ -180,7 +184,14 @@ class MultilayerPerceptron(Classifier):
         # You need to implement something here
 
         self._feed_forward(test_instance)
-        return self.layers[-1].outp[0] > 0.5
+
+        maxa = 0
+
+        for i in range(1, 10):
+            if self.layers[-1].outp[i] > self.layers[-1].outp[maxa]:
+                maxa = i
+
+        return maxa
 
     def evaluate(self, test=None):
         """Evaluate a whole dataset.
