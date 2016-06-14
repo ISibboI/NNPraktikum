@@ -15,7 +15,7 @@ class MultilayerPerceptron(Classifier):
 
     def __init__(self, train, valid, test, layers=None, input_weights=None,
                  output_task='classification', output_activation='softmax',
-                 cost='crossentropy', learning_rate=0.01, epochs=50):
+                 cost='crossentropy', start_learning_rate=0.1, stop_learning_rate=0.01, epochs=50):
 
         """
         A digit-7 recognizer based on logistic regression algorithm
@@ -38,7 +38,8 @@ class MultilayerPerceptron(Classifier):
         performances: array of floats
         """
 
-        self.learning_rate = learning_rate
+        self.start_learning_rate = start_learning_rate
+        self.stop_learning_rate = stop_learning_rate
         self.epochs = epochs
         self.output_task = output_task  # Either classification or regression
         self.output_activation = output_activation
@@ -67,7 +68,7 @@ class MultilayerPerceptron(Classifier):
         self.layers = []
         output_activation = "sigmoid"
         # self.layers.append(LogisticLayer(input_size, input_size, None, output_activation, False))
-        # self.layers.append(LogisticLayer(input_size, input_size, None, output_activation, False))
+        self.layers.append(LogisticLayer(input_size, input_size, None, output_activation, False))
         self.layers.append(LogisticLayer(input_size, input_size, None, output_activation, False))
         self.layers.append(LogisticLayer(input_size, 10, None, output_activation, True))
 
@@ -125,10 +126,10 @@ class MultilayerPerceptron(Classifier):
         """
 
         # Learning rate modification function
-        modifier = (exp(1 - epoch_fraction) - 1) * 8 + 1
+        learning_rate = self.start_learning_rate * (1 - epoch_fraction) + self.stop_learning_rate * epoch_fraction
 
         for i in range(len(self.layers)):
-            self.layers[i].updateWeights(self.learning_rate * modifier)
+            self.layers[i].updateWeights(learning_rate)
 
     def train(self, verbose=True):
         """
