@@ -67,7 +67,7 @@ class MultilayerPerceptron(Classifier):
         # Build up the network from specific layers
         self.layers = []
         output_activation = "sigmoid"
-        # self.layers.append(LogisticLayer(input_size, input_size, None, output_activation, False))
+        self.layers.append(LogisticLayer(input_size, input_size, None, output_activation, False))
         self.layers.append(LogisticLayer(input_size, input_size, None, output_activation, False))
         self.layers.append(LogisticLayer(input_size, input_size, None, output_activation, False))
         self.layers.append(LogisticLayer(input_size, 10, None, output_activation, True))
